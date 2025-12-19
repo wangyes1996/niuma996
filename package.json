@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:no-type-check": "next build --no-type-check",
     "build:mcp": "tsc -p tsconfig.mcp.json",
     "start": "next start",
     "lint": "eslint",

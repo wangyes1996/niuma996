@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# pm2
+logs/
+.pm2/
+.ecosystem.config.js
+pm2-start.sh
