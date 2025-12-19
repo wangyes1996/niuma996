@@ -417,7 +417,7 @@ export default function Home() {
             <Button 
               variant="contained" 
               color="primary" 
-              startIcon={<RefreshIcon />}
+              startIcon={isAnalyzing ? <CircularProgress size={20} color="inherit" /> : <RefreshIcon />}
               onClick={triggerAIAnalysis}
               disabled={isAnalyzing}
               sx={{ borderRadius: 2, boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}
@@ -430,6 +430,38 @@ export default function Home() {
             <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
               {analysisError}
             </Alert>
+          )}
+          
+          {!isAnalyzing && !aiAnalysis && (
+            <Card sx={{ borderRadius: 2, boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)' }}>
+              <CardContent sx={{ p: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <InfoIcon sx={{ mr: 1.5, color: 'primary.main' }} />
+                  <Typography variant="h6" fontWeight="600" color="text.primary">
+                    市场分析概览
+                  </Typography>
+                </Box>
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="body1" sx={{ mb: 1.5, lineHeight: 1.8, color: 'text.primary' }}>
+                    欢迎使用AI市场分析功能！点击右侧的"开始分析"按钮，系统将为您提供实时的加密货币市场分析。
+                  </Typography>
+                  <Typography variant="body1" sx={{ mb: 1.5, lineHeight: 1.8, color: 'text.primary' }}>
+                    分析内容包括：
+                  </Typography>
+                  <Box component="ul" sx={{ pl: 4, mb: 1.5 }}>
+                    <Typography variant="body1" sx={{ mb: 0.5, color: 'text.primary' }}>• 技术指标分析</Typography>
+                    <Typography variant="body1" sx={{ mb: 0.5, color: 'text.primary' }}>• 市场趋势预测</Typography>
+                    <Typography variant="body1" sx={{ mb: 0.5, color: 'text.primary' }}>• 买卖信号建议</Typography>
+                    <Typography variant="body1" sx={{ mb: 0.5, color: 'text.primary' }}>• 风险评估</Typography>
+                  </Box>
+                </Box>
+                <Box sx={{ bgcolor: '#f5f5f5', p: 2, borderRadius: 1 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    分析结果将以Markdown格式展示，包含图表、表格和详细的文字说明。
+                  </Typography>
+                </Box>
+              </CardContent>
+            </Card>
           )}
           
           {isAnalyzing && (
