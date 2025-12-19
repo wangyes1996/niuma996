@@ -1,0 +1,43 @@
+{
+  "name": "niuma996",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "build:mcp": "tsc -p tsconfig.mcp.json",
+    "start": "next start",
+    "lint": "eslint",
+    "mcp:server": "node dist/mcp/crypto-indicators-server.js",
+    "mcp:dev": "concurrently \"npm run build:mcp -- --watch\" \"npm run mcp:server\""
+  },
+  "dependencies": {
+    "@ai-sdk/openai-compatible": "^1.0.29",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mastra/core": "^0.24.9",
+    "@modelcontextprotocol/sdk": "^1.25.0",
+    "@mui/icons-material": "^7.3.6",
+    "@mui/material": "^7.3.6",
+    "binance-api-node": "^0.13.5",
+    "mcp-node": "^1.2.2",
+    "next": "16.0.8",
+    "openai": "^6.15.0",
+    "react": "19.2.1",
+    "react-dom": "19.2.1",
+    "react-markdown": "^10.1.0",
+    "rimraf": "^6.1.2",
+    "sass": "^1.96.0",
+    "ta-lib": "^0.11.0",
+    "technicalindicators": "^3.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "babel-plugin-react-compiler": "1.0.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.0.8",
+    "typescript": "^5"
+  }
+}

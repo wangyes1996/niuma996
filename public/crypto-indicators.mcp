@@ -1,0 +1,233 @@
+{
+  "api": {
+    "name": "Crypto Indicators API",
+    "version": "1.1.0",
+    "description": "使用tulind计算加密货币的各种技术指标，数据来源于币安API",
+    "endpoint": "/api/crypto/indicators",
+    "method": "POST",
+    "baseUrl": "http://localhost:3000",
+    "category": "cryptocurrency"
+  },
+  "parameters": {
+    "required": [
+      {
+        "name": "symbol",
+        "type": "string",
+        "description": "加密货币代码，必须在COIN_OPTIONS配置范围内",
+        "example": "BTC",
+        "allowedValues": ["BTC", "ETH", "SOL"]
+      },
+      {
+        "name": "timeframe",
+        "type": "string",
+        "description": "时间周期",
+        "example": "1h",
+        "allowedValues": ["1m", "5m", "15m", "1h", "4h", "1d"]
+      },
+      {
+        "name": "indicator",
+        "type": "string",
+        "description": "技术指标类型",
+        "example": "rsi",
+        "allowedValues": ["sma", "ema", "rsi", "macd", "stoch", "bbands", "adx", "cci", "roc", "willr"]
+      }
+    ],
+    "optional": [
+      {
+        "name": "period",
+        "type": "integer",
+        "description": "指标计算周期",
+        "example": 14,
+        "default": 14,
+        "min": 1,
+        "max": 200
+      },
+      {
+        "name": "limit",
+        "type": "integer",
+        "description": "获取的K线数据数量",
+        "example": 100,
+        "default": 100,
+        "min": 10,
+        "max": 1000
+      }
+    ]
+  },
+  "indicatorDetails": {
+    "sma": {
+      "name": "Simple Moving Average",
+      "description": "简单移动平均线，用于识别趋势方向"
+    },
+    "ema": {
+      "name": "Exponential Moving Average",
+      "description": "指数移动平均线，对近期价格变化更敏感"
+    },
+    "rsi": {
+      "name": "Relative Strength Index",
+      "description": "相对强弱指数，用于判断超买超卖状态"
+    },
+    "macd": {
+      "name": "Moving Average Convergence Divergence",
+      "description": "移动平均收敛发散，用于识别趋势变化和动量"
+    },
+    "stoch": {
+      "name": "Stochastic Oscillator",
+      "description": "随机振荡器，用于衡量价格在一段时间内的相对位置"
+    },
+    "bbands": {
+      "name": "Bollinger Bands",
+      "description": "布林带，用于衡量价格波动范围和波动率"
+    },
+    "adx": {
+      "name": "Average Directional Index",
+      "description": "平均方向指数，用于衡量趋势强度"
+    },
+    "cci": {
+      "name": "Commodity Channel Index",
+      "description": "商品通道指数，用于衡量价格与平均价格的偏离程度"
+    },
+    "roc": {
+      "name": "Rate of Change",
+      "description": "变化率，用于衡量价格变化速度"
+    },
+    "willr": {
+      "name": "Williams %R",
+      "description": "威廉指标，用于判断超买超卖状态"
+    }
+  },
+  "response": {
+    "type": "object",
+    "properties": {
+      "symbol": {
+        "type": "string",
+        "description": "请求的加密货币代码"
+      },
+      "timeframe": {
+        "type": "string",
+        "description": "请求的时间周期"
+      },
+      "indicator": {
+        "type": "string",
+        "description": "请求的技术指标类型"
+      },
+      "period": {
+        "type": "integer",
+        "description": "使用的计算周期"
+      },
+      "data": {
+        "type": "object",
+        "properties": {
+          "prices": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "description": "原始价格数据"
+          },
+          "indicator": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "description": "计算得到的指标值"
+          },
+          "timestamps": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "description": "对应数据的时间戳"
+          }
+        }
+      },
+      "metadata": {
+        "type": "object",
+        "properties": {
+          "supportCoins": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "支持的加密货币列表"
+          },
+          "supportTimeframes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "支持的时间周期列表"
+          },
+          "supportIndicators": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "支持的技术指标列表"
+          },
+          "updateTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "数据更新时间"
+          }
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "request": {
+        "method": "POST",
+        "url": "/api/crypto/indicators",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "symbol": "BTC",
+          "timeframe": "1h",
+          "indicator": "rsi",
+          "period": 14
+        }
+      },
+      "response": {
+        "symbol": "BTC",
+        "timeframe": "1h",
+        "indicator": "rsi",
+        "period": 14,
+        "data": {
+          "prices": [36000, 36100, 36200, ...],
+          "indicator": [55.2, 56.7, 58.3, ...],
+          "timestamps": [1635763200000, 1635766800000, ...]
+        },
+        "metadata": {
+          "supportCoins": ["BTC", "ETH", "SOL"],
+          "supportTimeframes": ["1m", "5m", "15m", "1h", "4h", "1d"],
+          "supportIndicators": ["sma", "ema", "rsi", "macd", "stoch", "bbands", "adx", "cci", "roc", "willr"],
+          "updateTime": "2023-11-01T12:00:00Z"
+        }
+      }
+    }
+  ],
+  "errorResponses": [
+    {
+      "statusCode": 400,
+      "description": "参数错误",
+      "example": {
+        "error": "必须指定加密货币代码 (symbol)"
+      }
+    },
+    {
+      "statusCode": 500,
+      "description": "服务器内部错误",
+      "example": {
+        "error": "获取K线数据失败"
+      }
+    }
+  ],
+  "dependencies": {
+    "talib": "技术指标计算库",
+    "binance-api-node": "币安API客户端库"
+  },
+  "environment": {
+    "COIN_OPTIONS": "配置支持的加密货币列表，逗号分隔"
+  }
+}
