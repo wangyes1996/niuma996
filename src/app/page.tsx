@@ -81,40 +81,63 @@ export default function Home() {
       setAiAnalysis('');
       
       try {
-        // 使用Server-Sent Events代替WebSocket
-        const eventSource = new EventSource(`/api/ai/mastra-analysis-ws?symbol=BTC`);
+        // 使用Fetch API代替SSE，避免连接问题
+        const response = await fetch(`/api/ai/mastra-analysis-ws?symbol=BTC`);
         
-        eventSource.onmessage = (event) => {
-          const data = JSON.parse(event.data);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const reader = response.body?.getReader();
+        if (!reader) {
+          throw new Error('无法获取响应流');
+        }
+        
+        const decoder = new TextDecoder();
+        let buffer = '';
+        
+        while (true) {
+          const { done, value } = await reader.read();
           
-          if (data.type === 'chunk') {
-            setAiAnalysis(prev => prev + data.content);
-          } else if (data.type === 'complete') {
-            setIsAnalyzing(false);
-            eventSource.close();
-          } else if (data.type === 'error') {
-            setAnalysisError(data.message);
-            setIsAnalyzing(false);
-            eventSource.close();
+          if (done) {
+            break;
           }
-        };
-        
-        eventSource.onerror = (error) => {
-          console.error('SSE错误:', error);
-          setAnalysisError('SSE连接错误');
-          setIsAnalyzing(false);
-          eventSource.close();
-        };
-        
-        // 保存eventSource引用以便清理
-        setWebsocket(eventSource);
+          
+          buffer += decoder.decode(value, { stream: true });
+          
+          // 处理SSE格式的数据
+          const messages = buffer.split('\n\n');
+          buffer = messages.pop() || '';
+          
+          for (const message of messages) {
+            if (message.startsWith('data: ')) {
+              const dataStr = message.slice(6);
+              try {
+                const data = JSON.parse(dataStr);
+                
+                if (data.type === 'chunk') {
+                  setAiAnalysis(prev => prev + data.content);
+                } else if (data.type === 'complete') {
+                  setIsAnalyzing(false);
+                  break;
+                } else if (data.type === 'error') {
+                  setAnalysisError(data.message);
+                  setIsAnalyzing(false);
+                  break;
+                }
+              } catch (parseError) {
+                console.error('解析SSE数据失败:', parseError);
+              }
+            }
+          }
+        }
       } catch (err) {
         setAnalysisError(err instanceof Error ? err.message : 'AI分析失败');
         setIsAnalyzing(false);
       }
     };
     
-    // 清理SSE连接
+    // 清理WebSocket连接（已不再使用）
     useEffect(() => {
       return () => {
         if (websocket) {
@@ -178,7 +201,6 @@ export default function Home() {
           {loading ? (
             <Grid container spacing={2}>
               {[1, 2, 3, 4].map((item) => (
-                   {/*@ts-ignore */}
                 <Grid item xs={12} sm={6} md={3} key={item}>
                   <Card sx={{ borderRadius: 2, boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)' }}>
                     <CardContent>
@@ -411,12 +433,32 @@ export default function Home() {
           )}
           
           {isAnalyzing && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
-              <CircularProgress color="primary" />
+            <Box sx={{ mb: 3 }}>
+              <Card sx={{ borderRadius: 2, boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)' }}>
+                <CardContent sx={{ p: 3 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <CircularProgress color="primary" size={20} sx={{ mr: 1.5 }} />
+                    <Typography variant="body1" color="text.secondary">
+                      分析中...请稍候
+                    </Typography>
+                  </Box>
+                  <Box sx={{ bgcolor: '#f0f0f0', p: 2, borderRadius: 1, minHeight: '200px' }}>
+                    <ReactMarkdown
+                      components={{
+                        p: ({ node, ...props }) => <Typography variant="body1" sx={{ mb: 1.5, lineHeight: 1.8, color: 'text.primary' }} {...props} />,
+                        code: ({ node, ...props }) => <Box component="code" sx={{ bgcolor: '#e0e0e0', px: 1, py: 0.5, borderRadius: 0.5, fontFamily: 'monospace' }} {...props} />,
+                        pre: ({ node, ...props }) => <Box component="pre" sx={{ bgcolor: '#e0e0e0', p: 2, borderRadius: 1, overflowX: 'auto', fontFamily: 'monospace' }} {...props} />,
+                      }}
+                    >
+                      {aiAnalysis}
+                    </ReactMarkdown>
+                  </Box>
+                </CardContent>
+              </Card>
             </Box>
           )}
           
-          {aiAnalysis && (
+          {aiAnalysis && !isAnalyzing && (
             <Card sx={{ borderRadius: 2, boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)' }}>
               <CardContent sx={{ p: 3 }}>
                 <ReactMarkdown

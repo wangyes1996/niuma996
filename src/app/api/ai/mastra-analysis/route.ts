@@ -110,7 +110,7 @@ ${JSON.stringify(technicalData, null, 2)}
       maxTokens: 2000,
     });
     
-    console.log('Agent.generate result:', result);
+    // console.log('Agent.generate result:', result);
     
     // 检查返回结果结构
     if (result.text) {
