@@ -81,8 +81,8 @@ export default function Home() {
       setAiAnalysis('');
       
       try {
-        // 使用Fetch API代替SSE，避免连接问题
-        const response = await fetch(`/api/ai/mastra-analysis-ws?symbol=BTC`);
+        // 使用超快API端点以提高性能
+        const response = await fetch(`/api/ai/mastra-analysis-fast?symbol=BTC`);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
