@@ -59,10 +59,78 @@ const deepseekProvider = createOpenAICompatible({
 // 创建Mastra实例
 const mastra = new Mastra();
 
+// 硬编码的交易工具
+const tradeTools = {
+  buy: async ({ symbol, quantity, price }: { symbol: string; quantity: string; price?: string }) => {
+    const response = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/binance/trade`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'buy',
+        symbol,
+        quantity,
+        price,
+        orderType: price ? 'LIMIT' : 'MARKET'
+      })
+    });
+    return await response.json();
+  },
+  
+  sell: async ({ symbol, quantity, price }: { symbol: string; quantity: string; price?: string }) => {
+    const response = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/binance/trade`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'sell',
+        symbol,
+        quantity,
+        price,
+        orderType: price ? 'LIMIT' : 'MARKET'
+      })
+    });
+    return await response.json();
+  },
+  
+  setStopLoss: async ({ symbol, stopPrice }: { symbol: string; stopPrice: string }) => {
+    const response = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/binance/trade`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'set_stop_loss',
+        symbol,
+        stopPrice
+      })
+    });
+    return await response.json();
+  },
+  
+  setTakeProfit: async ({ symbol, stopPrice }: { symbol: string; stopPrice: string }) => {
+    const response = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/binance/trade`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'set_take_profit',
+        symbol,
+        stopPrice
+      })
+    });
+    return await response.json();
+  }
+};
+
 // 创建分析Agent
 const analysisAgent = new Agent({
   name: 'crypto-analyst',
-  instructions: '你是一个专业的加密货币交易分析师，擅长技术指标分析和市场趋势判断。请用中文回答，保持专业、客观。',
+  instructions: `你是一个专业的加密货币交易分析师，擅长技术指标分析和市场趋势判断。
+
+你可以使用以下工具来执行交易操作：
+1. buy - 买入开仓
+2. sell - 卖出开仓  
+3. setStopLoss - 设置止损
+4. setTakeProfit - 设置止盈
+
+请根据市场分析和仓位情况，给出具体的交易建议，并在必要时自动执行交易操作。
+请用中文回答，保持专业、客观。`,
   model: deepseekProvider.chatModel('deepseek-chat'),
 });
 

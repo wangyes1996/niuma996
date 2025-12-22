@@ -25,6 +25,29 @@ module.exports = {
       restart_delay: 4000,
       // 内存限制
       max_memory_restart: '1G'
+    },
+    {
+      name: 'smart-trade-timer',
+      script: './scripts/smart-trade-timer.js',
+      instances: 1,
+      exec_mode: 'fork',
+      watch: false,
+      env: {
+        NODE_ENV: 'production'
+      },
+      env_development: {
+        NODE_ENV: 'development'
+      },
+      // 日志配置
+      error_file: './logs/smart-trade-err.log',
+      out_file: './logs/smart-trade-out.log',
+      log_file: './logs/smart-trade-combined.log',
+      time: true,
+      // 重启配置
+      max_restarts: 5,
+      restart_delay: 10000,
+      // 内存限制
+      max_memory_restart: '512M'
     }
   ]
 };
