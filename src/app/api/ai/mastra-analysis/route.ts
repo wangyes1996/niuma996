@@ -91,18 +91,37 @@ export async function getTechnicalData(symbol: string = 'BTC') {
 // 使用Mastra生成分析
 export async function generateAnalysisWithMastra(symbol: string, technicalData: any) {
   try {
+    // 调用/binance/account获取仓位信息
+    const accountResponse = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/binance/account`);
+    const accountData = await accountResponse.json();
+    const positions = accountData.positions || [];
+
     // 准备提示词
-    const prompt = `请分析${symbol}的市场行情，基于以下技术指标：
+    let prompt = `请分析${symbol}的市场行情，基于以下技术指标：
 
-${JSON.stringify(technicalData, null, 2)}
+       ${JSON.stringify(technicalData, null, 2)}
 
-请提供：
-1. 当前趋势分析
-2. 关键支撑位和阻力位
-3. 技术指标解读
-4. 交易建议
+       请提供：
+       1. 当前趋势分析
+       2. 关键支撑位和阻力位
+       3. 技术指标解读
+       4. 交易建议
+       
+       请用中文回答，保持专业、客观。`;
 
-请用中文回答，保持专业、客观。`;
+    // 如果有仓位信息，添加到提示词
+    if (positions && positions.length > 0) {
+      prompt += `
+
+       结合以下仓位信息给出具体操作建议：
+       ${JSON.stringify(positions, null, 2)}
+
+       请特别关注：
+       1. 当前持仓的盈亏情况
+       2. 是否需要加仓、减仓或平仓
+       3. 止损和止盈建议
+       4. 风险控制策略`;
+    };
 
     // 使用Agent生成分析
     const result = await analysisAgent.generate(prompt, {
