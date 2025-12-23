@@ -197,8 +197,8 @@ export async function POST(request: Request) {
         const stopOrderType = action === 'set_stop_loss' ? 'STOP_MARKET' : 'TAKE_PROFIT_MARKET';
         
         // 先获取当前持仓
-        const positions = await client.futuresPositionRisk();
-        const currentPosition = positions.find((p: any) => p.symbol === symbol && parseFloat(p.positionAmt) !== 0);
+        const currentPositions = await client.futuresPositionRisk();
+        const currentPosition = currentPositions.find((p: any) => p.symbol === symbol && parseFloat(p.positionAmt) !== 0);
         
         if (!currentPosition) {
           return NextResponse.json(
