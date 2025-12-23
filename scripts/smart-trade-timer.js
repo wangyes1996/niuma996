@@ -163,7 +163,7 @@ async function initialize() {
   
   // 设置定时任务 - 每5分钟执行一次
   log('设置定时任务...');
-  const job = schedule.scheduleJob('*/5 * * * *', async () => {
+  const job = schedule.scheduleJob('*/10 * * * *', async () => {
     try {
       log('定时器触发，开始执行智能交易分析...');
       
