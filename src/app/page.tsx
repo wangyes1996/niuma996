@@ -1,14 +1,55 @@
 'use client';
 //@ts-nocheck
-import { Box, Container, Typography, Button, Paper, useTheme, CircularProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, Grid, Card, CardContent, Alert, Skeleton } from '@mui/material';
-import { ArrowRight as ArrowRightIcon, Home as HomeIcon, Info as InfoIcon, Code as CodeIcon, AccountBalanceWallet as AccountBalanceWalletIcon, TrendingUp as TrendingUpIcon, AttachMoney as AttachMoneyIcon, ShowChart as ShowChartIcon, Refresh as RefreshIcon } from '@mui/icons-material';
+import { 
+  Box, 
+  Container, 
+  Typography, 
+  Button, 
+  Paper, 
+  useTheme, 
+  CircularProgress, 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableContainer, 
+  TableHead, 
+  TableRow, 
+  Chip, 
+  Grid, 
+  Card, 
+  CardContent, 
+  Alert, 
+  Skeleton,
+  Fade,
+  Zoom,
+  useMediaQuery,
+  alpha,
+  IconButton
+} from '@mui/material';
+import { 
+  ArrowRight as ArrowRightIcon, 
+  Home as HomeIcon, 
+  Info as InfoIcon, 
+  Code as CodeIcon, 
+  AccountBalanceWallet as AccountBalanceWalletIcon, 
+  TrendingUp as TrendingUpIcon, 
+  AttachMoney as AttachMoneyIcon, 
+  ShowChart as ShowChartIcon, 
+  Refresh as RefreshIcon,
+  Assessment as AssessmentIcon,
+  BarChart as BarChartIcon,
+  Timeline as TimelineIcon,
+  Speed as SpeedIcon
+} from '@mui/icons-material';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 
-
 export default function Home() {
     const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const [fadeIn, setFadeIn] = useState(false);
+    
     // 更细粒度的状态管理，减少不必要的重新渲染
     const [accountBalance, setAccountBalance] = useState<any>(null);
     const [positions, setPositions] = useState<any[]>([]);
@@ -57,8 +98,9 @@ export default function Home() {
     };
 
     useEffect(() => {
+      setFadeIn(true);
       fetchAccountInfo(); // 初始获取数据
-      const interval = setInterval(fetchAccountInfo, 10000); // 设置10秒刷新间隔
+      const interval = setInterval(fetchAccountInfo, 60000); // 设置60秒刷新间隔
       return () => clearInterval(interval); // 清理定时器
     }, []);
 
@@ -146,252 +188,428 @@ export default function Home() {
       };
     }, [websocket]);
 
+    // 现代化卡片组件
+    const OverviewCard = ({ title, value, unit, color, icon, description }: any) => (
+      <Fade in={fadeIn} timeout={600}>
+        <Card 
+          sx={{ 
+            height: '100%', 
+            borderRadius: 4, 
+            boxShadow: theme => `0 8px 25px ${alpha(theme.palette.primary.main, 0.1)}`,
+            border: '1px solid',
+            borderColor: 'divider',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              transform: 'translateY(-4px)',
+              boxShadow: theme => `0 12px 35px ${alpha(theme.palette.primary.main, 0.15)}`,
+            },
+          }}
+        >
+          <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}>
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+              <Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                  {icon}
+                  <Typography 
+                    variant="body2" 
+                    sx={{ 
+                      color: 'text.secondary', 
+                      ml: 1,
+                      fontWeight: 500,
+                      fontSize: '0.75rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em'
+                    }}
+                  >
+                    {title}
+                  </Typography>
+                </Box>
+                <Typography 
+                  variant="h5" 
+                  fontWeight="700" 
+                  sx={{ 
+                    color: color || 'text.primary',
+                    fontSize: { xs: '1.25rem', sm: '1.5rem' },
+                    mb: 0.5
+                  }}
+                >
+                  {formatNumber(value)}
+                  <Typography 
+                    component="span" 
+                    variant="body2" 
+                    color="text.secondary" 
+                    sx={{ ml: 0.5, fontWeight: 500 }}
+                  >
+                    {unit}
+                  </Typography>
+                </Typography>
+                {description && (
+                  <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
+                    {description}
+                  </Typography>
+                )}
+              </Box>
+              <Box
+                sx={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 3,
+                  background: theme => `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.1)}, ${alpha(theme.palette.primary.main, 0.05)})`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'primary.main',
+                }}
+              >
+                {icon}
+              </Box>
+            </Box>
+          </CardContent>
+        </Card>
+      </Fade>
+    );
+
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: '#f8fafc' }}>
+    <Box sx={{ 
+      minHeight: '100vh', 
+      bgcolor: theme => alpha(theme.palette.grey[50], 0.5),
+      background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)'
+    }}>
       {/* Header */}
       <Box 
         sx={{ 
-          py: 3, 
+          py: { xs: 2, md: 3 }, 
           px: { xs: 2, sm: 3 },
-          bgcolor: 'white',
-          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-          borderBottom: '1px solid #e2e8f0',
+          bgcolor: 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(10px)',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+          position: 'sticky',
+          top: 0,
+          zIndex: 100,
         }}
       >
         <Container maxWidth="lg">
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box 
-              sx={{ 
-                width: 40, 
-                height: 40, 
-                borderRadius: '8px', 
-                bgcolor: 'primary.main',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-              }}
-            >
-              <AccountBalanceWalletIcon sx={{ color: 'white', fontSize: 20 }} />
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: { xs: 1.5, md: 2 },
+            flexWrap: 'wrap'
+          }}>
+            <Zoom in={fadeIn} timeout={800}>
+              <Box 
+                sx={{ 
+                  width: { xs: 36, md: 40 }, 
+                  height: { xs: 36, md: 40 }, 
+                  borderRadius: 3, 
+                  background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 8px 25px rgba(99, 102, 241, 0.3)',
+                }}
+              >
+                <AccountBalanceWalletIcon sx={{ color: 'white', fontSize: { xs: 20, md: 24 } }} />
+              </Box>
+            </Zoom>
+            <Box>
+              <Typography 
+                variant={{ xs: "h6", md: "h5" }} 
+                component="h1" 
+                fontWeight="800" 
+                sx={{ 
+                  color: 'text.primary',
+                  background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                  backgroundClip: 'text',
+                  textFillColor: 'transparent',
+                  mb: 0.5
+                }}
+              >
+                数字资产管理系统
+              </Typography>
+              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
+                智能交易 · 实时分析 · 专业管理
+              </Typography>
             </Box>
-            <Typography variant="h5" component="h1" fontWeight="600" color="text.primary">
-              数字资产管理系统
-            </Typography>
           </Box>
         </Container>
       </Box>
 
-      <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Container maxWidth="lg" sx={{ py: { xs: 3, md: 4 } }}>
         {/* 错误提示 */}
         {error && (
-          <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
-            {error}
-          </Alert>
+          <Fade in timeout={500}>
+            <Alert 
+              severity="error" 
+              sx={{ 
+                mb: 3, 
+                borderRadius: 3,
+                boxShadow: '0 4px 12px rgba(244, 67, 54, 0.15)',
+                border: '1px solid rgba(244, 67, 54, 0.2)'
+              }}
+            >
+              {error}
+            </Alert>
+          </Fade>
         )}
 
         {/* 账户概览 */}
-        <Box sx={{ mb: 4 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-            <AttachMoneyIcon sx={{ mr: 1.5, color: 'primary.main', fontSize: 24 }} />
-            <Typography variant="h6" fontWeight="600" color="text.primary">
+        <Box sx={{ mb: { xs: 3, md: 4 } }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: { xs: 2, md: 3 } }}>
+            <Zoom in={fadeIn} timeout={1000}>
+              <Box
+                sx={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 2.5,
+                  background: 'linear-gradient(135deg, #06b6d4, #0891b2)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  mr: 2,
+                  boxShadow: '0 4px 12px rgba(6, 182, 212, 0.3)',
+                }}
+              >
+                <AttachMoneyIcon sx={{ color: 'white', fontSize: 20 }} />
+              </Box>
+            </Zoom>
+            <Typography variant="h5" fontWeight="700" color="text.primary" sx={{ letterSpacing: '-0.02em' }}>
               账户概览
             </Typography>
           </Box>
           
           {loading ? (
-            <Grid container spacing={2}>
+            <Grid container spacing={{ xs: 1.5, md: 2 }}>
               {[1, 2, 3, 4].map((item) => (
                 <Grid item xs={12} sm={6} md={3} key={item}>
-                  <Card sx={{ borderRadius: 2, boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)' }}>
+                  <Card sx={{ 
+                    borderRadius: 4, 
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+                    border: '1px solid rgba(0, 0, 0, 0.05)'
+                  }}>
                     <CardContent>
-                      <Skeleton variant="text" width={100} />
-                      <Skeleton variant="text" width={80} height={30} />
+                      <Skeleton variant="text" width={100} sx={{ mb: 1 }} />
+                      <Skeleton variant="text" width={80} height={40} />
                     </CardContent>
                   </Card>
                 </Grid>
               ))}
             </Grid>
           ) : accountBalance ? (
-            <Grid container spacing={2}>
-               
-              {/*   @ts-ignore */}
-
+            <Grid container spacing={{ xs: 1.5, md: 2 }}>
               <Grid item xs={12} sm={6} md={3}>
-                <Card sx={{ 
-                  height: '100%', 
-                  borderRadius: 2, 
-                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-                  borderLeft: '4px solid',
-                  borderColor: 'primary.main',
-                }}>
-                  <CardContent>
-                    <Typography color="text.secondary" variant="body2" sx={{ mb: 1 }}>
-                      总保证金余额
-                    </Typography>
-                    <Typography variant="h6" fontWeight="600" sx={{ color: 'text.primary' }}>
-                      {formatNumber(accountBalance.totalMarginBalance)} 
-                      <Typography component="span" variant="body2" color="text.secondary" sx={{ ml: 0.5 }}>
-                        USDT
-                      </Typography>
-                    </Typography>
-                  </CardContent>
-                </Card>
+                <OverviewCard
+                  title="总保证金余额"
+                  value={accountBalance.totalMarginBalance}
+                  unit="USDT"
+                  color="text.primary"
+                  icon={<TimelineIcon sx={{ fontSize: 20 }} />}
+                  description="账户总保证金"
+                />
               </Grid>
-                            {/*   @ts-ignore */}
-
               <Grid item xs={12} sm={6} md={3}>
-                <Card sx={{ 
-                  height: '100%', 
-                  borderRadius: 2, 
-                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-                  borderLeft: '4px solid',
-                  borderColor: 'info.main',
-                }}>
-                  <CardContent>
-                    <Typography color="text.secondary" variant="body2" sx={{ mb: 1 }}>
-                      总钱包余额
-                    </Typography>
-                    <Typography variant="h6" fontWeight="600" sx={{ color: 'text.primary' }}>
-                      {formatNumber(accountBalance.totalWalletBalance)}
-                      <Typography component="span" variant="body2" color="text.secondary" sx={{ ml: 0.5 }}>
-                        USDT
-                      </Typography>
-                    </Typography>
-                  </CardContent>
-                </Card>
+                <OverviewCard
+                  title="总钱包余额"
+                  value={accountBalance.totalWalletBalance}
+                  unit="USDT"
+                  color="text.primary"
+                  icon={<AccountBalanceWalletIcon sx={{ fontSize: 20 }} />}
+                  description="钱包总资产"
+                />
               </Grid>
-              {/*   @ts-ignore */}
               <Grid item xs={12} sm={6} md={3}>
-                <Card 
-                  sx={{ 
-                    height: '100%',
-                    borderRadius: 2, 
-                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-                    borderLeft: '4px solid',
-                    borderColor: getProfitColor(accountBalance.totalUnrealizedProfit),
-                  }}
-                >
-                  <CardContent>
-                    <Typography color="text.secondary" variant="body2" sx={{ mb: 1 }}>
-                      总未实现盈亏
-                    </Typography>
-                    <Typography 
-                      variant="h6" 
-                      fontWeight="600" 
-                      sx={{ 
-                        color: getProfitColor(accountBalance.totalUnrealizedProfit)
-                      }}
-                    >
-                      {formatNumber(accountBalance.totalUnrealizedProfit)}
-                      <Typography component="span" variant="body2" color="text.secondary" sx={{ ml: 0.5 }}>
-                        USDT
-                      </Typography>
-                    </Typography>
-                  </CardContent>
-                </Card>
+                <OverviewCard
+                  title="总未实现盈亏"
+                  value={accountBalance.totalUnrealizedProfit}
+                  unit="USDT"
+                  color={getProfitColor(accountBalance.totalUnrealizedProfit)}
+                  icon={<BarChartIcon sx={{ fontSize: 20 }} />}
+                  description="当前持仓盈亏"
+                />
               </Grid>
-              {/*   @ts-ignore */}
-
               <Grid item xs={12} sm={6} md={3}>
-                <Card sx={{ 
-                  height: '100%', 
-                  borderRadius: 2, 
-                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-                  borderLeft: '4px solid',
-                  borderColor: 'success.main',
-                }}>
-                  <CardContent>
-                    <Typography color="text.secondary" variant="body2" sx={{ mb: 1 }}>
-                      可用余额
-                    </Typography>
-                    <Typography variant="h6" fontWeight="600" sx={{ color: 'text.primary' }}>
-                      {formatNumber(accountBalance.availableBalance)}
-                      <Typography component="span" variant="body2" color="text.secondary" sx={{ ml: 0.5 }}>
-                        USDT
-                      </Typography>
-                    </Typography>
-                  </CardContent>
-                </Card>
+                <OverviewCard
+                  title="可用余额"
+                  value={accountBalance.availableBalance}
+                  unit="USDT"
+                  color="text.primary"
+                  icon={<SpeedIcon sx={{ fontSize: 20 }} />}
+                  description="可交易余额"
+                />
               </Grid>
             </Grid>
           ) : (
-            <Alert severity="info" sx={{ borderRadius: 2 }}>
+            <Alert 
+              severity="info" 
+              sx={{ 
+                borderRadius: 3,
+                boxShadow: '0 4px 12px rgba(2, 136, 209, 0.15)'
+              }}
+            >
               暂无账户数据
             </Alert>
           )}
         </Box>
 
         {/* 持仓情况 */}
-        <Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-            <ShowChartIcon sx={{ mr: 1.5, color: 'primary.main', fontSize: 24 }} />
-            <Typography variant="h6" fontWeight="600" color="text.primary">
+        <Box sx={{ mb: { xs: 3, md: 4 } }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: { xs: 2, md: 3 } }}>
+            <Zoom in={fadeIn} timeout={1200}>
+              <Box
+                sx={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 2.5,
+                  background: 'linear-gradient(135deg, #10b981, #059669)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  mr: 2,
+                  boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+                }}
+              >
+                <ShowChartIcon sx={{ color: 'white', fontSize: 20 }} />
+              </Box>
+            </Zoom>
+            <Typography variant="h5" fontWeight="700" color="text.primary" sx={{ letterSpacing: '-0.02em' }}>
               持仓情况
             </Typography>
           </Box>
           
           {loading ? (
-            <Card sx={{ borderRadius: 2, boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)' }}>
+            <Card sx={{ 
+              borderRadius: 4, 
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+              border: '1px solid rgba(0, 0, 0, 0.05)'
+            }}>
               <CardContent>
-                <Skeleton variant="rectangular" height={200} />
+                <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 2 }} />
               </CardContent>
             </Card>
           ) : positions && positions.length > 0 ? (
-            <Card sx={{ borderRadius: 2, boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)' }}>
+            <Card sx={{ 
+              borderRadius: 4, 
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+              border: '1px solid rgba(0, 0, 0, 0.05)',
+              overflow: 'hidden'
+            }}>
               <CardContent sx={{ p: 0 }}>
                 <TableContainer>
                   <Table>
                     <TableHead>
-                      <TableRow>
-                        <TableCell sx={{ fontWeight: '600', color: 'text.primary', py: 2 }}>交易对</TableCell>
-                        <TableCell align="right" sx={{ fontWeight: '600', color: 'text.primary', py: 2 }}>持仓数量</TableCell>
-                        <TableCell align="right" sx={{ fontWeight: '600', color: 'text.primary', py: 2 }}>入场价格</TableCell>
-                        <TableCell align="right" sx={{ fontWeight: '600', color: 'text.primary', py: 2 }}>标记价格</TableCell>
-                        <TableCell align="right" sx={{ fontWeight: '600', color: 'text.primary', py: 2 }}>未实现盈亏</TableCell>
-                        <TableCell align="right" sx={{ fontWeight: '600', color: 'text.primary', py: 2 }}>杠杆</TableCell>
-                        <TableCell align="right" sx={{ fontWeight: '600', color: 'text.primary', py: 2 }}>保证金类型</TableCell>
+                      <TableRow sx={{ background: 'linear-gradient(135deg, #f8fafc, #f1f5f9)' }}>
+                        <TableCell sx={{ 
+                          fontWeight: '700', 
+                          color: 'text.primary', 
+                          py: 2.5,
+                          fontSize: '0.875rem',
+                          borderBottom: '2px solid #e5e7eb'
+                        }}>交易对</TableCell>
+                        <TableCell align="right" sx={{ 
+                          fontWeight: '700', 
+                          color: 'text.primary', 
+                          py: 2.5,
+                          fontSize: '0.875rem',
+                          borderBottom: '2px solid #e5e7eb'
+                        }}>持仓数量</TableCell>
+                        <TableCell align="right" sx={{ 
+                          fontWeight: '700', 
+                          color: 'text.primary', 
+                          py: 2.5,
+                          fontSize: '0.875rem',
+                          borderBottom: '2px solid #e5e7eb'
+                        }}>入场价格</TableCell>
+                        <TableCell align="right" sx={{ 
+                          fontWeight: '700', 
+                          color: 'text.primary', 
+                          py: 2.5,
+                          fontSize: '0.875rem',
+                          borderBottom: '2px solid #e5e7eb'
+                        }}>标记价格</TableCell>
+                        <TableCell align="right" sx={{ 
+                          fontWeight: '700', 
+                          color: 'text.primary', 
+                          py: 2.5,
+                          fontSize: '0.875rem',
+                          borderBottom: '2px solid #e5e7eb'
+                        }}>未实现盈亏</TableCell>
+                        <TableCell align="right" sx={{ 
+                          fontWeight: '700', 
+                          color: 'text.primary', 
+                          py: 2.5,
+                          fontSize: '0.875rem',
+                          borderBottom: '2px solid #e5e7eb'
+                        }}>杠杆</TableCell>
+                        <TableCell align="right" sx={{ 
+                          fontWeight: '700', 
+                          color: 'text.primary', 
+                          py: 2.5,
+                          fontSize: '0.875rem',
+                          borderBottom: '2px solid #e5e7eb'
+                        }}>保证金类型</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {positions.map((position: any) => (
-                        <TableRow key={position.symbol} hover sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                          <TableCell component="th" scope="row" sx={{ py: 2 }}>
-                            <Typography fontWeight="500" color="text.primary">
-                              {position.symbol}
-                            </Typography>
-                          </TableCell>
-                          <TableCell align="right" sx={{ py: 2 }}>{position.positionAmt}</TableCell>
-                          <TableCell align="right" sx={{ py: 2 }}>{position.entryPrice}</TableCell>
-                          <TableCell align="right" sx={{ py: 2 }}>{position.markPrice}</TableCell>
-                          <TableCell 
-                            align="right" 
-                            sx={{ 
-                              py: 2,
-                              fontWeight: '600',
-                              color: getProfitColor(position.unrealizedProfit)
-                            }}
-                          >
-                            {formatNumber(position.unrealizedProfit)} USDT
-                          </TableCell>
-                          <TableCell align="right" sx={{ py: 2 }}>
-                            <Chip 
-                              label={`${position.leverage}x`} 
-                              size="small" 
-                              color="primary" 
-                              variant="outlined" 
-                              sx={{ fontWeight: '600' }}
-                            />
-                          </TableCell>
-                          <TableCell align="right" sx={{ py: 2 }}>
-                            <Chip 
-                              label={position.marginType} 
-                              size="small" 
-                              color={position.marginType === 'isolated' ? 'warning' : 'info'} 
-                              variant="filled" 
-                              sx={{ fontWeight: '500' }}
-                            />
-                          </TableCell>
-                        </TableRow>
+                      {positions.map((position: any, index: number) => (
+                        <Fade in={fadeIn} timeout={800 + index * 100} key={position.symbol}>
+                          <TableRow hover sx={{ 
+                            '&:last-child td, &:last-child th': { border: 0 },
+                            '&:hover': {
+                              backgroundColor: 'rgba(99, 102, 241, 0.02)',
+                            }
+                          }}>
+                            <TableCell component="th" scope="row" sx={{ py: 2.5 }}>
+                              <Typography fontWeight="600" color="text.primary" sx={{ fontSize: '0.875rem' }}>
+                                {position.symbol}
+                              </Typography>
+                            </TableCell>
+                            <TableCell align="right" sx={{ py: 2.5, fontWeight: 500 }}>{position.positionAmt}</TableCell>
+                            <TableCell align="right" sx={{ py: 2.5, fontWeight: 500 }}>{position.entryPrice}</TableCell>
+                            <TableCell align="right" sx={{ py: 2.5, fontWeight: 500 }}>{position.markPrice}</TableCell>
+                            <TableCell 
+                              align="right" 
+                              sx={{ 
+                                py: 2.5,
+                                fontWeight: '700',
+                                color: getProfitColor(position.unrealizedProfit),
+                                fontSize: '0.875rem'
+                              }}
+                            >
+                              {formatNumber(position.unrealizedProfit)} USDT
+                            </TableCell>
+                            <TableCell align="right" sx={{ py: 2.5 }}>
+                              <Chip 
+                                label={`${position.leverage}x`} 
+                                size="small" 
+                                color="primary" 
+                                variant="filled" 
+                                sx={{ 
+                                  fontWeight: '700',
+                                  background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                  color: 'white',
+                                  borderRadius: 2,
+                                  px: 1
+                                }}
+                              />
+                            </TableCell>
+                            <TableCell align="right" sx={{ py: 2.5 }}>
+                              <Chip 
+                                label={position.marginType} 
+                                size="small" 
+                                color={position.marginType === 'isolated' ? 'warning' : 'info'} 
+                                variant="filled" 
+                                sx={{ 
+                                  fontWeight: '600',
+                                  borderRadius: 2,
+                                  px: 1,
+                                  background: position.marginType === 'isolated' 
+                                    ? 'linear-gradient(135deg, #f59e0b, #d97706)'
+                                    : 'linear-gradient(135deg, #06b6d4, #0891b2)'
+                                }}
+                              />
+                            </TableCell>
+                          </TableRow>
+                        </Fade>
                       ))}
                     </TableBody>
                   </Table>
@@ -399,18 +617,47 @@ export default function Home() {
               </CardContent>
             </Card>
           ) : (
-            <Alert severity="info" sx={{ borderRadius: 2 }}>
+            <Alert 
+              severity="info" 
+              sx={{ 
+                borderRadius: 3,
+                boxShadow: '0 4px 12px rgba(2, 136, 209, 0.15)'
+              }}
+            >
               暂无持仓记录
             </Alert>
           )}
         </Box>
 
         {/* AI分析区域 */}
-        <Box sx={{ mt: 6 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, justifyContent: 'space-between' }}>
+        <Box sx={{ mt: { xs: 3, md: 4 } }}>
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            mb: { xs: 2, md: 3 }, 
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: 2
+          }}>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <TrendingUpIcon sx={{ mr: 1.5, color: 'primary.main', fontSize: 24 }} />
-              <Typography variant="h6" fontWeight="600" color="text.primary">
+              <Zoom in={fadeIn} timeout={1400}>
+                <Box
+                  sx={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 2.5,
+                    background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    mr: 2,
+                    boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)',
+                  }}
+                >
+                  <AssessmentIcon sx={{ color: 'white', fontSize: 20 }} />
+                </Box>
+              </Zoom>
+              <Typography variant="h5" fontWeight="700" color="text.primary" sx={{ letterSpacing: '-0.02em' }}>
                 AI市场分析
               </Typography>
             </Box>
@@ -420,66 +667,127 @@ export default function Home() {
               startIcon={isAnalyzing ? <CircularProgress size={20} color="inherit" /> : <RefreshIcon />}
               onClick={triggerAIAnalysis}
               disabled={isAnalyzing}
-              sx={{ borderRadius: 2, boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}
+              sx={{ 
+                borderRadius: 3, 
+                boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)',
+                background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                color: 'white',
+                fontWeight: 600,
+                px: 3,
+                py: 1,
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #4f46e5, #7c3aed)',
+                  boxShadow: '0 6px 16px rgba(99, 102, 241, 0.4)',
+                  transform: 'translateY(-1px)',
+                },
+                transition: 'all 0.3s ease'
+              }}
             >
               {isAnalyzing ? '分析中...' : '开始分析'}
             </Button>
           </Box>
           
           {analysisError && (
-            <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
-              {analysisError}
-            </Alert>
+            <Fade in timeout={500}>
+              <Alert 
+                severity="error" 
+                sx={{ 
+                  mb: 3, 
+                  borderRadius: 3,
+                  boxShadow: '0 4px 12px rgba(244, 67, 54, 0.15)',
+                  border: '1px solid rgba(244, 67, 54, 0.2)'
+                }}
+              >
+                {analysisError}
+              </Alert>
+            </Fade>
           )}
           
           {!isAnalyzing && !aiAnalysis && (
-            <Card sx={{ borderRadius: 2, boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)' }}>
-              <CardContent sx={{ p: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <InfoIcon sx={{ mr: 1.5, color: 'primary.main' }} />
-                  <Typography variant="h6" fontWeight="600" color="text.primary">
-                    市场分析概览
-                  </Typography>
-                </Box>
-                <Box sx={{ mb: 3 }}>
-                  <Typography variant="body1" sx={{ mb: 1.5, lineHeight: 1.8, color: 'text.primary' }}>
-                    欢迎使用AI市场分析功能！点击右侧的"开始分析"按钮，系统将为您提供实时的加密货币市场分析。
-                  </Typography>
-                  <Typography variant="body1" sx={{ mb: 1.5, lineHeight: 1.8, color: 'text.primary' }}>
-                    分析内容包括：
-                  </Typography>
-                  <Box component="ul" sx={{ pl: 4, mb: 1.5 }}>
-                    <Typography variant="body1" sx={{ mb: 0.5, color: 'text.primary' }}>• 技术指标分析</Typography>
-                    <Typography variant="body1" sx={{ mb: 0.5, color: 'text.primary' }}>• 市场趋势预测</Typography>
-                    <Typography variant="body1" sx={{ mb: 0.5, color: 'text.primary' }}>• 买卖信号建议</Typography>
-                    <Typography variant="body1" sx={{ mb: 0.5, color: 'text.primary' }}>• 风险评估</Typography>
+            <Fade in timeout={800}>
+              <Card sx={{ 
+                borderRadius: 4, 
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+                border: '1px solid rgba(0, 0, 0, 0.05)',
+                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.9))',
+                backdropFilter: 'blur(10px)'
+              }}>
+                <CardContent sx={{ p: { xs: 3, md: 4 } }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                    <InfoIcon sx={{ mr: 1.5, color: 'primary.main' }} />
+                    <Typography variant="h6" fontWeight="700" color="text.primary">
+                      市场分析概览
+                    </Typography>
                   </Box>
-                </Box>
-                <Box sx={{ bgcolor: '#f5f5f5', p: 2, borderRadius: 1 }}>
-                  <Typography variant="body2" color="text.secondary">
-                    分析结果将以Markdown格式展示，包含图表、表格和详细的文字说明。
-                  </Typography>
-                </Box>
-              </CardContent>
-            </Card>
+                  <Box sx={{ mb: 4 }}>
+                    <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.8, color: 'text.primary', fontSize: '1rem' }}>
+                      欢迎使用AI市场分析功能！点击右侧的"开始分析"按钮，系统将为您提供实时的加密货币市场分析。
+                    </Typography>
+                    <Typography variant="h6" fontWeight="600" sx={{ mb: 2, color: 'text.primary' }}>
+                      分析内容包括：
+                    </Typography>
+                    <Box component="ul" sx={{ pl: 4, mb: 3 }}>
+                      <Typography variant="body1" sx={{ mb: 1, color: 'text.primary', lineHeight: 1.7 }}>• 技术指标分析</Typography>
+                      <Typography variant="body1" sx={{ mb: 1, color: 'text.primary', lineHeight: 1.7 }}>• 市场趋势预测</Typography>
+                      <Typography variant="body1" sx={{ mb: 1, color: 'text.primary', lineHeight: 1.7 }}>• 买卖信号建议</Typography>
+                      <Typography variant="body1" sx={{ mb: 1, color: 'text.primary', lineHeight: 1.7 }}>• 风险评估</Typography>
+                    </Box>
+                  </Box>
+                  <Box sx={{ 
+                    bgcolor: 'rgba(99, 102, 241, 0.05)', 
+                    p: 3, 
+                    borderRadius: 3,
+                    border: '1px solid rgba(99, 102, 241, 0.1)'
+                  }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                      分析结果将以Markdown格式展示，包含图表、表格和详细的文字说明。
+                    </Typography>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Fade>
           )}
           
           {isAnalyzing && (
             <Box sx={{ mb: 3 }}>
-              <Card sx={{ borderRadius: 2, boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)' }}>
-                <CardContent sx={{ p: 3 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    <CircularProgress color="primary" size={20} sx={{ mr: 1.5 }} />
-                    <Typography variant="body1" color="text.secondary">
+              <Card sx={{ 
+                borderRadius: 4, 
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+                border: '1px solid rgba(0, 0, 0, 0.05)'
+              }}>
+                <CardContent sx={{ p: { xs: 3, md: 4 } }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                    <CircularProgress color="primary" size={24} sx={{ mr: 2 }} />
+                    <Typography variant="h6" color="text.secondary" fontWeight="600">
                       分析中...请稍候
                     </Typography>
                   </Box>
-                  <Box sx={{ bgcolor: '#f0f0f0', p: 2, borderRadius: 1, minHeight: '200px' }}>
+                  <Box sx={{ 
+                    bgcolor: 'rgba(99, 102, 241, 0.02)', 
+                    p: 3, 
+                    borderRadius: 3,
+                    border: '1px solid rgba(99, 102, 241, 0.1)',
+                    minHeight: '200px'
+                  }}>
                     <ReactMarkdown
                       components={{
-                        p: ({ node, ...props }) => <Typography variant="body1" sx={{ mb: 1.5, lineHeight: 1.8, color: 'text.primary' }} {...props} />,
-                        code: ({ node, ...props }) => <Box component="code" sx={{ bgcolor: '#e0e0e0', px: 1, py: 0.5, borderRadius: 0.5, fontFamily: 'monospace' }} {...props} />,
-                        pre: ({ node, ...props }) => <Box component="pre" sx={{ bgcolor: '#e0e0e0', p: 2, borderRadius: 1, overflowX: 'auto', fontFamily: 'monospace' }} {...props} />,
+                        p: ({ node, ...props }) => <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.8, color: 'text.primary', fontSize: '1rem' }} {...props} />,
+                        code: ({ node, ...props }) => <Box component="code" sx={{ 
+                          bgcolor: 'rgba(99, 102, 241, 0.1)', 
+                          px: 1.5, 
+                          py: 0.5, 
+                          borderRadius: 1, 
+                          fontFamily: 'monospace',
+                          fontSize: '0.875rem'
+                        }} {...props} />,
+                        pre: ({ node, ...props }) => <Box component="pre" sx={{ 
+                          bgcolor: 'rgba(99, 102, 241, 0.1)', 
+                          p: 2, 
+                          borderRadius: 2, 
+                          overflowX: 'auto', 
+                          fontFamily: 'monospace',
+                          mb: 2
+                        }} {...props} />,
                       }}
                     >
                       {aiAnalysis}
@@ -491,30 +799,67 @@ export default function Home() {
           )}
           
           {aiAnalysis && !isAnalyzing && (
-            <Card sx={{ borderRadius: 2, boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)' }}>
-              <CardContent sx={{ p: 3 }}>
-                <ReactMarkdown
-                  components={{
-                    h1: ({ node, ...props }) => <Typography variant="h4" fontWeight="600" sx={{ mb: 2, color: 'text.primary' }} {...props} />,
-                    h2: ({ node, ...props }) => <Typography variant="h5" fontWeight="600" sx={{ mb: 1.5, color: 'text.primary' }} {...props} />,
-                    h3: ({ node, ...props }) => <Typography variant="h6" fontWeight="600" sx={{ mb: 1, color: 'text.primary' }} {...props} />,
-                    p: ({ node, ...props }) => <Typography variant="body1" sx={{ mb: 1.5, lineHeight: 1.8, color: 'text.primary' }} {...props} />,
-                    ul: ({ node, ...props }) => <Box component="ul" sx={{ pl: 4, mb: 1.5 }} {...props} />,
-                    ol: ({ node, ...props }) => <Box component="ol" sx={{ pl: 4, mb: 1.5 }} {...props} />,
-                    li: ({ node, ...props }) => <Typography variant="body1" sx={{ mb: 0.5, color: 'text.primary' }} {...props} />,
-                    code: ({ node, ...props }) => <Box component="code" sx={{ bgcolor: '#f0f0f0', px: 1, py: 0.5, borderRadius: 0.5, fontFamily: 'monospace' }} {...props} />,
-                    pre: ({ node, ...props }) => <Box component="pre" sx={{ bgcolor: '#f0f0f0', p: 2, borderRadius: 1, overflowX: 'auto', fontFamily: 'monospace' }} {...props} />,
-                    blockquote: ({ node, ...props }) => <Box component="blockquote" sx={{ borderLeft: '4px solid #1976d2', pl: 2, ml: 0, color: '#666' }} {...props} />,
-                    table: ({ node, ...props }) => <TableContainer sx={{ mb: 1.5 }} {...props} />,
-                    tr: ({ node, ...props }) => <TableRow {...props} />,
-                    th: ({ node, ...props }) => <TableCell sx={{ fontWeight: '600', bgcolor: '#f5f5f5' }} {...props} />,
-                    td: ({ node, ...props }) => <TableCell {...props} />,
-                  }}
-                >
-                  {aiAnalysis}
-                </ReactMarkdown>
-              </CardContent>
-            </Card>
+            <Fade in timeout={800}>
+              <Card sx={{ 
+                borderRadius: 4, 
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+                border: '1px solid rgba(0, 0, 0, 0.05)',
+                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.9))',
+                backdropFilter: 'blur(10px)'
+              }}>
+                <CardContent sx={{ p: { xs: 3, md: 4 } }}>
+                  <ReactMarkdown
+                    components={{
+                      h1: ({ node, ...props }) => <Typography variant="h4" fontWeight="800" sx={{ mb: 3, color: 'text.primary', letterSpacing: '-0.02em' }} {...props} />,
+                      h2: ({ node, ...props }) => <Typography variant="h5" fontWeight="700" sx={{ mb: 2, color: 'text.primary', letterSpacing: '-0.02em' }} {...props} />,
+                      h3: ({ node, ...props }) => <Typography variant="h6" fontWeight="700" sx={{ mb: 1.5, color: 'text.primary' }} {...props} />,
+                      p: ({ node, ...props }) => <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.8, color: 'text.primary', fontSize: '1rem' }} {...props} />,
+                      ul: ({ node, ...props }) => <Box component="ul" sx={{ pl: 4, mb: 2 }} {...props} />,
+                      ol: ({ node, ...props }) => <Box component="ol" sx={{ pl: 4, mb: 2 }} {...props} />,
+                      li: ({ node, ...props }) => <Typography variant="body1" sx={{ mb: 1, color: 'text.primary', lineHeight: 1.7 }} {...props} />,
+                      code: ({ node, ...props }) => <Box component="code" sx={{ 
+                        bgcolor: 'rgba(99, 102, 241, 0.1)', 
+                        px: 1.5, 
+                        py: 0.5, 
+                        borderRadius: 1, 
+                        fontFamily: 'monospace',
+                        fontSize: '0.875rem'
+                      }} {...props} />,
+                      pre: ({ node, ...props }) => <Box component="pre" sx={{ 
+                        bgcolor: 'rgba(99, 102, 241, 0.08)', 
+                        p: 3, 
+                        borderRadius: 3, 
+                        overflowX: 'auto', 
+                        fontFamily: 'monospace',
+                        mb: 2,
+                        border: '1px solid rgba(99, 102, 241, 0.1)'
+                      }} {...props} />,
+                      blockquote: ({ node, ...props }) => <Box component="blockquote" sx={{ 
+                        borderLeft: '4px solid #6366f1', 
+                        pl: 3, 
+                        ml: 0, 
+                        color: '#6b7280',
+                        background: 'rgba(99, 102, 241, 0.02)',
+                        py: 2,
+                        borderRadius: '0 8px 8px 0',
+                        mb: 2
+                      }} {...props} />,
+                      table: ({ node, ...props }) => <TableContainer sx={{ mb: 2, borderRadius: 2, boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)' }} {...props} />,
+                      tr: ({ node, ...props }) => <TableRow {...props} />,
+                      th: ({ node, ...props }) => <TableCell sx={{ 
+                        fontWeight: '700', 
+                        bgcolor: 'rgba(99, 102, 241, 0.05)',
+                        py: 2,
+                        borderBottom: '2px solid #e5e7eb'
+                      }} {...props} />,
+                      td: ({ node, ...props }) => <TableCell sx={{ py: 1.5 }} {...props} />,
+                    }}
+                  >
+                    {aiAnalysis}
+                  </ReactMarkdown>
+                </CardContent>
+              </Card>
+            </Fade>
           )}
         </Box>
       </Container>

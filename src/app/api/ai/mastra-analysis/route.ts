@@ -88,7 +88,7 @@ export async function getTechnicalData(symbol: string = 'BTC') {
   }
 }
 
-// 使用Mastra生成分析
+// 使用Mastra生成分析（不带自动操作）
 export async function generateAnalysisWithMastra(symbol: string, technicalData: any) {
   try {
     // 调用/binance/account获取仓位信息
@@ -144,6 +144,8 @@ export async function generateAnalysisWithMastra(symbol: string, technicalData: 
     throw error;
   }
 }
+
+
 
 export async function POST(request: Request) {
   try {
