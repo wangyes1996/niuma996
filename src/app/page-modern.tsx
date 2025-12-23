@@ -623,24 +623,41 @@ export default function Home() {
                   AI市场分析
                 </Typography>
               </Box>
-              <Button 
-                variant="contained" 
-                color="primary" 
-                startIcon={isAnalyzing ? <CircularProgress size={20} color="inherit" /> : <RefreshIcon />}
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={
+                  isAnalyzing ? (
+                    <CircularProgress size={20} sx={{ color: 'white' }} />
+                  ) : (
+                    <RefreshIcon />
+                  )
+                }
                 onClick={triggerAIAnalysis}
                 disabled={isAnalyzing}
-                sx={{ 
-                  borderRadius: 3, 
+                sx={{
+                  borderRadius: 3,
                   boxShadow: theme => `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
                   px: 3,
                   py: 1.5,
-                  fontWeight: 600,
+                  fontWeight: 700,
                   '&:hover': {
                     boxShadow: theme => `0 6px 20px ${alpha(theme.palette.primary.main, 0.4)}`,
+                  },
+                  '&.Mui-disabled': {
+                    background: theme => `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main}) !important`,
+                    color: 'white !important',
+                    opacity: 1,
+                    cursor: 'wait'
                   }
                 }}
               >
-                {isAnalyzing ? '分析中...' : '开始分析'}
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Box component="span" sx={{ fontWeight: 700 }}>{isAnalyzing ? '分析中' : '开始分析'}</Box>
+                  {isAnalyzing && (
+                    <Box component="span" sx={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.9)' }}>请稍候</Box>
+                  )}
+                </Box>
               </Button>
             </Box>
             
