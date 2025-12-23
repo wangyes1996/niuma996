@@ -3,6 +3,8 @@
   --foreground: #171717;
   --primary: #3b82f6;
   --primary-foreground: #ffffff;
+  --muted-2: #f3f6fb;
+  --glass: rgba(255,255,255,0.6);
   --secondary: #f1f5f9;
   --secondary-foreground: #0f172a;
   --muted: #f8fafc;
@@ -15,6 +17,13 @@
   --input: #ffffff;
   --ring: #3b82f6;
   --radius: 0.5rem;
+  /* spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 32px;
+  --container-max: 1200px;
 }
 
 .dark {
@@ -53,6 +62,8 @@ body {
   background: var(--background);
   font-family: var(--font-geist-sans);
   line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 a {
@@ -110,17 +121,40 @@ a {
 /* 响应式断点优化 */
 @media (max-width: 768px) {
   .MuiContainer-root {
-    padding-left: 16px !important;
-    padding-right: 16px !important;
+    padding-left: var(--space-3) !important;
+    padding-right: var(--space-3) !important;
   }
   
   .MuiGrid-container {
-    margin-left: -8px !important;
-    margin-right: -8px !important;
+    margin-left: calc(var(--space-2) * -1) !important;
+    margin-right: calc(var(--space-2) * -1) !important;
   }
   
   .MuiGrid-item {
-    padding-left: 8px !important;
-    padding-right: 8px !important;
+    padding-left: var(--space-2) !important;
+    padding-right: var(--space-2) !important;
   }
+}
+
+/* Utility container for non-MUI sections to keep consistent max width */
+.app-container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: var(--container-max);
+  padding-left: var(--space-3);
+  padding-right: var(--space-3);
+}
+
+/* Focus outlines for accessibility */
+*:focus {
+  outline: 3px solid rgba(59,130,246,0.15);
+  outline-offset: 2px;
+}
+
+/* Small helper for subtle glass panels */
+.glass-panel {
+  background: linear-gradient(180deg, var(--glass), rgba(255,255,255,0.3));
+  border-radius: calc(var(--radius) * 1.2);
+  box-shadow: 0 6px 20px rgba(16,24,40,0.06);
 }

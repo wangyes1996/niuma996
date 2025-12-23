@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import Binance from 'binance-api-node';
+import { formatToBeijing } from '@/lib/time';
 
 export async function GET(request: Request) {
  
@@ -34,7 +35,7 @@ export async function GET(request: Request) {
     );
 
     // 构造响应数据
-    const responseData = {
+  const responseData = {
       // 账户余额信息
       account: {
         totalMarginBalance: accountInfo.totalMarginBalance,
@@ -56,6 +57,7 @@ export async function GET(request: Request) {
         isolatedMargin: position.isolatedMargin,
       })),
       timestamp: new Date().toISOString(),
+      timestampBeijing: formatToBeijing(new Date()),
     };
 
     return NextResponse.json(responseData);

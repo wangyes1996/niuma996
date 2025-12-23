@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import Binance from 'binance-api-node';
 import { SMA, EMA, RSI, MACD } from 'technicalindicators';
+import { formatToBeijing } from '@/lib/time';
 
 // 从环境变量获取支持的加密货币列表（例如: BTC,ETH,SOL）
 const COIN_OPTIONS = process.env.COIN_OPTIONS?.split(',') || [];
@@ -105,7 +106,7 @@ async function getDataForTimeframe(client: any, symbol: string, timeframe: strin
     },
   };
 
-  return {
+    return {
     timestamps: validTimestamps,
     opens: validOpens,
     closes: validCloses,
@@ -115,7 +116,8 @@ async function getDataForTimeframe(client: any, symbol: string, timeframe: strin
       fetchedCandles: klines.length,
       returnedCandles: returnCount,
       validStartIndex: validStartIndex,
-      updateTime: new Date().toISOString(),
+        updateTime: new Date().toISOString(),
+        updateTimeBeijing: formatToBeijing(new Date()),
       note: `获取60条数据用于计算，返回${returnCount}条有效数据。所有指标都有值且可靠。`
     }
   };
@@ -159,6 +161,7 @@ export async function POST(request: Request) {
       data: allData,
       metadata: {
         updateTime: new Date().toISOString(),
+        updateTimeBeijing: formatToBeijing(new Date()),
         note: '返回所有时间框架的SMA、EMA、RSI、MACD指标和交易量数据。所有返回的数据都有值且可靠，最多返回20条有效数据。'
       }
     };

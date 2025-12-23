@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import Binance from 'binance-api-node';
+import { formatToBeijing } from '@/lib/time';
 
 export async function POST(request: Request) {
   try {
@@ -295,7 +296,8 @@ export async function POST(request: Request) {
       message: '操作成功',
       action,
       symbol,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      timestampBeijing: formatToBeijing(new Date())
     });
 
   } catch (error: any) {
@@ -312,7 +314,8 @@ export async function POST(request: Request) {
         error: errorMessage,
         action,
         symbol,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        timestampBeijing: formatToBeijing(new Date())
       },
       { status: 500 }
     );
@@ -361,7 +364,8 @@ export async function GET(request: Request) {
         openOrders,
         recentTrades: trades,
         leverageInfo: leverage,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        timestampBeijing: formatToBeijing(new Date())
       });
     } else {
       // 获取所有持仓和挂单（并行处理）
@@ -382,7 +386,8 @@ export async function GET(request: Request) {
           totalMarginBalance: account.totalMarginBalance,
           availableBalance: account.availableBalance
         } : null,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        timestampBeijing: formatToBeijing(new Date())
       });
     }
 
@@ -392,7 +397,8 @@ export async function GET(request: Request) {
     return NextResponse.json(
       { 
         error: error.message || '获取持仓信息失败',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        timestampBeijing: formatToBeijing(new Date())
       },
       { status: 500 }
     );

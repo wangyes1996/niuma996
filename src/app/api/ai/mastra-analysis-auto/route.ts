@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { formatToBeijing } from '@/lib/time';
 import { Mastra } from '@mastra/core/mastra';
 import { Agent } from '@mastra/core/agent';
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
@@ -209,7 +210,8 @@ export async function generateAnalysisWithAutoTrading(symbol: string, technicalD
       analysis: aiResponse,
       decision: aiDecision,
       autoTrade: tradeResult,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      timestampBeijing: formatToBeijing(new Date())
     };
   } catch (error) {
     console.error('Mastra分析失败:', error);
@@ -263,14 +265,16 @@ async function executeAIDecision(symbol: string, decision: any) {
         success: true,
         orderId: result.data?.orderId,
         executedPrice: result.data?.avgPrice || decision.price,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        timestampBeijing: formatToBeijing(new Date())
       };
     } else {
       console.error('AI交易执行失败:', result.error);
       return {
         success: false,
         error: result.error,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        timestampBeijing: formatToBeijing(new Date())
       };
     }
   } catch (error) {
@@ -278,7 +282,8 @@ async function executeAIDecision(symbol: string, decision: any) {
     return {
       success: false,
       error: error.message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      timestampBeijing: formatToBeijing(new Date())
     };
   }
 }
@@ -375,10 +380,12 @@ export async function POST(request: Request) {
         symbol: technicalData.symbol,
         timeframes: Object.keys(technicalData.data),
         updateTime: new Date().toISOString(),
+        updateTimeBeijing: formatToBeijing(new Date())
       },
       metadata: {
         model: 'deepseek-chat',
         analysisTime: new Date().toISOString(),
+        analysisTimeBeijing: formatToBeijing(new Date()),
         framework: 'mastra',
         autoTradingEnabled: true
       }

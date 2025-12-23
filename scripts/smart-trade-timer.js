@@ -161,7 +161,7 @@ async function initialize() {
     log(`启动分析失败: ${error.message}`, 'ERROR');
   });
   
-  // 设置定时任务 - 每5分钟执行一次
+  // 设置定时任务 - 每10分钟执行一次
   log('设置定时任务...');
   const job = schedule.scheduleJob('*/10 * * * *', async () => {
     try {

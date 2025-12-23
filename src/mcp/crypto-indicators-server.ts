@@ -7,6 +7,7 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import Binance from 'binance-api-node';
 import { SMA, EMA, RSI, MACD } from 'technicalindicators';
+import { formatToBeijing } from '../lib/time';
 
 // 支持的加密货币列表
 const COIN_OPTIONS = process.env.COIN_OPTIONS?.split(',') || ['BTC', 'ETH', 'SOL'];
@@ -173,6 +174,7 @@ async function calculateIndicator(params: {
           ? indicatorResult.DIF.length 
           : indicatorResult.length,
         updateTime: new Date().toISOString(),
+        updateTimeBeijing: formatToBeijing(new Date()),
         note: '使用 technicalindicators 库计算，指标前部为 null 表示计算所需历史数据不足',
       },
     };

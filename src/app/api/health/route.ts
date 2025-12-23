@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { formatToBeijing } from '@/lib/time';
 
 export async function GET() {
   try {
@@ -10,7 +11,8 @@ export async function GET() {
       return NextResponse.json({
         status: 'unhealthy',
         message: `缺少环境变量: ${missingEnvVars.join(', ')}`,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        timestampBeijing: formatToBeijing(new Date())
       }, { status: 503 });
     }
 
@@ -18,6 +20,7 @@ export async function GET() {
       status: 'healthy',
       message: '系统运行正常',
       timestamp: new Date().toISOString(),
+      timestampBeijing: formatToBeijing(new Date()),
       uptime: process.uptime(),
       memory: process.memoryUsage()
     });
@@ -26,7 +29,8 @@ export async function GET() {
     return NextResponse.json({
       status: 'unhealthy',
       message: `健康检查失败: ${error.message}`,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      timestampBeijing: formatToBeijing(new Date())
     }, { status: 500 });
   }
 }

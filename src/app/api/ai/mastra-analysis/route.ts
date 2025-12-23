@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
+
 import { Mastra } from '@mastra/core/mastra';
 import { Agent } from '@mastra/core/agent';
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 import { MastraModelGateway, type ProviderConfig } from '@mastra/core/llm';
 import type { LanguageModelV2 } from '@ai-sdk/provider';
+import formatToBeijing from '@/lib/time';
 
 // 创建自定义DeepSeek网关
 class DeepSeekGateway extends MastraModelGateway {
@@ -172,10 +174,12 @@ export async function POST(request: Request) {
         symbol: technicalData.symbol,
         timeframes: Object.keys(technicalData.data),
         updateTime: new Date().toISOString(),
+        updateTimeBeijing: formatToBeijing(new Date())
       },
       metadata: {
         model: 'deepseek-chat',
         analysisTime: new Date().toISOString(),
+        analysisTimeBeijing: formatToBeijing(new Date()),
         framework: 'mastra'
       }
     });
