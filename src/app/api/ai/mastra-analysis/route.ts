@@ -102,13 +102,12 @@ async function executeAIDecision(symbol: string, decision: any) {
       positionSide: 'BOTH'
     };
 
-    console.log('执行AI交易决策:', tradeData);
 
     const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
     const tradeUrl = `${baseUrl}/api/binance/trade-enhanced`;
-    
-    console.log('Sending trade request to:', tradeUrl);
-    
+
+
+
     const response = await fetch(tradeUrl, {
       method: 'POST',
       headers: {
@@ -130,8 +129,8 @@ async function executeAIDecision(symbol: string, decision: any) {
       if (decision.stopLoss || decision.takeProfit) {
         await setRiskManagement(symbol, decision);
       }
-      
-      console.log('AI交易执行成功:', result);
+
+
       return {
         success: true,
         orderId: result.data?.orderId,
@@ -214,19 +213,19 @@ async function setRiskManagement(symbol: string, decision: any) {
     }
 
     const results = await Promise.allSettled(riskOrders);
-    console.log('风险管理设置完成:', results);
-    
+
+
     return results;
   } catch (error) {
-    console.error('设置风险管理失败:', error);
+
     return [];
   }
 }
 
 // 生成分析（支持自动交易）
 export async function generateAnalysis(
-  symbol: string, 
-  technicalData: any, 
+  symbol: string,
+  technicalData: any,
   enableAutoTrading: boolean = false
 ) {
   try {
@@ -235,13 +234,15 @@ export async function generateAnalysis(
     const accountData = await accountResponse.json();
     const positions = accountData.positions || [];
 
+
+
     // 根据模式选择提示词文件
-    const promptFile = enableAutoTrading 
+    const promptFile = enableAutoTrading
       ? (process.env.MASTRA_AUTO_PROMPT_FILE || 'trading_prompt.txt')
       : 'analysis_prompt.txt';
-    
+
     let basePrompt = readPromptFile(promptFile);
-    
+
     // 如果没有找到对应的提示词文件，使用默认提示词
     if (!basePrompt) {
       basePrompt = enableAutoTrading
@@ -257,13 +258,21 @@ ${JSON.stringify(technicalData, null, 2)}`;
 
     // 如果有仓位信息，添加到提示词
     if (positions && positions.length > 0) {
-      const currentPosition = positions.find((p: any) => p.symbol === `${symbol}USDT` && parseFloat(p.positionAmt) !== 0);
+
+
+      const currentPosition = positions
+
+
+
       if (currentPosition) {
         prompt += `
 
 当前持仓信息：
 ${JSON.stringify(currentPosition, null, 2)}`;
-      }
+
+      } 
+    } else {
+
     }
 
     // 根据模式添加具体要求
@@ -306,12 +315,13 @@ ${JSON.stringify(currentPosition, null, 2)}`;
 请用中文回答，保持专业、客观。`;
     }
 
+
     // 使用Agent生成分析
     const result = await analysisAgent.generate(prompt, {
       temperature: enableAutoTrading ? 0.3 : 0.7, // 自动交易用更低温度提高准确性
       maxTokens: enableAutoTrading ? 1000 : 2000,
     });
-    
+
     const aiResponse = result.text || result.output || JSON.stringify(result);
 
     // 如果启用了自动交易，解析决策并执行
@@ -384,8 +394,8 @@ export async function POST(request: Request) {
     }
 
     // 解析请求参数
-    const { 
-      symbol = 'BTC', 
+    const {
+      symbol = 'BTC',
       enableAutoTrading = false,  // 是否启用自动交易
       confidenceThreshold = 0.7   // 置信度阈值
     } = await request.json();
@@ -395,8 +405,8 @@ export async function POST(request: Request) {
 
     // 生成分析（根据参数决定是否启用自动交易）
     const analysisResult = await generateAnalysis(symbol, technicalData, enableAutoTrading);
-    console.log('AI分析结果:', analysisResult);
-    
+
+
     // 构建响应数据
     const responseData = {
       success: true,
