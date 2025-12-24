@@ -49,13 +49,16 @@ async function executeSmartTradeAnalysis() {
   try {
     log(`开始执行${CONFIG.symbol}智能交易分析...`);
     
-    // 调用自动交易API
-    const response = await fetch(`${CONFIG.apiUrl}/api/ai/mastra-analysis-auto`, {
+    // 调用自动交易API（使用合并后的接口，启用自动交易模式）
+    const response = await fetch(`${CONFIG.apiUrl}/api/ai/mastra-analysis`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ symbol: CONFIG.symbol }),
+      body: JSON.stringify({ 
+        symbol: CONFIG.symbol,
+        enableAutoTrading: true  // 启用自动交易模式
+      }),
     });
 
     if (!response.ok) {

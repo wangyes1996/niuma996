@@ -188,13 +188,13 @@ export default function Home() {
       };
     }, [websocket]);
 
-    // 现代化卡片组件
+    // 现代化卡片组件（优化移动端显示）
     const OverviewCard = ({ title, value, unit, color, icon, description }: any) => (
       <Fade in={fadeIn} timeout={600}>
         <Card 
           sx={{ 
             height: '100%', 
-            borderRadius: 4, 
+            borderRadius: { xs: 3, sm: 4 }, 
             boxShadow: theme => `0 8px 25px ${alpha(theme.palette.primary.main, 0.1)}`,
             border: '1px solid',
             borderColor: 'divider',
@@ -205,20 +205,22 @@ export default function Home() {
             },
           }}
         >
-          <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}>
+          <CardContent sx={{ p: { xs: 2, sm: 3 }, '&:last-child': { pb: { xs: 2, sm: 3 } } }}>
             <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-              <Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  {icon}
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: { xs: 0.5, sm: 1 } }}>
+                  <Box sx={{ fontSize: { xs: 16, sm: 20 }, mr: 1 }}>{icon}</Box>
                   <Typography 
                     variant="body2" 
                     sx={{ 
                       color: 'text.secondary', 
-                      ml: 1,
                       fontWeight: 500,
-                      fontSize: '0.75rem',
+                      fontSize: { xs: '0.65rem', sm: '0.75rem' },
                       textTransform: 'uppercase',
-                      letterSpacing: '0.05em'
+                      letterSpacing: '0.05em',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
                     }}
                   >
                     {title}
@@ -229,8 +231,11 @@ export default function Home() {
                   fontWeight="700" 
                   sx={{ 
                     color: color || 'text.primary',
-                    fontSize: { xs: '1.25rem', sm: '1.5rem' },
-                    mb: 0.5
+                    fontSize: { xs: '1.1rem', sm: '1.5rem' },
+                    mb: { xs: 0.25, sm: 0.5 },
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
                   }}
                 >
                   {formatNumber(value)}
@@ -238,13 +243,22 @@ export default function Home() {
                     component="span" 
                     variant="body2" 
                     color="text.secondary" 
-                    sx={{ ml: 0.5, fontWeight: 500 }}
+                    sx={{ ml: 0.5, fontWeight: 500, fontSize: { xs: '0.7rem', sm: '0.875rem' } }}
                   >
                     {unit}
                   </Typography>
                 </Typography>
                 {description && (
-                  <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
+                  <Typography 
+                    variant="caption" 
+                    color="text.secondary" 
+                    sx={{ 
+                      fontSize: { xs: '0.65rem', sm: '0.75rem' },
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
                     {description}
                   </Typography>
                 )}
@@ -379,61 +393,62 @@ export default function Home() {
           </Box>
           
           {loading ? (
-            <Grid container spacing={{ xs: 1.5, md: 2 }}>
+            <Grid container spacing={{ xs: 1, sm: 1.5, md: 2 }}>
               {[1, 2, 3, 4].map((item) => (
-                <Grid item xs={12} sm={6} md={3} key={item}>
+                <Grid item xs={6} sm={6} md={3} key={item}>
                   <Card sx={{ 
-                    borderRadius: 4, 
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
-                    border: '1px solid rgba(0, 0, 0, 0.05)'
+                    borderRadius: { xs: 3, sm: 4 }, 
+                    boxShadow: '0 8px 25px rgba(99, 102, 241, 0.1)',
+                    border: '1px solid #e5e7eb'
                   }}>
-                    <CardContent>
-                      <Skeleton variant="text" width={100} sx={{ mb: 1 }} />
-                      <Skeleton variant="text" width={80} height={40} />
+                    <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+                      <Skeleton variant="rectangular" width={32} height={32} sx={{ mb: 1.5, borderRadius: 1.5 }} />
+                      <Skeleton variant="text" sx={{ fontSize: '0.7rem', mb: 0.5 }} />
+                      <Skeleton variant="text" sx={{ fontSize: '1.1rem', width: '70%' }} />
                     </CardContent>
                   </Card>
                 </Grid>
               ))}
             </Grid>
           ) : accountBalance ? (
-            <Grid container spacing={{ xs: 1.5, md: 2 }}>
-              <Grid item xs={12} sm={6} md={3}>
+            <Grid container spacing={{ xs: 1, sm: 1.5, md: 2 }}>
+              <Grid item xs={6} sm={6} md={3}>
                 <OverviewCard
                   title="总保证金余额"
                   value={accountBalance.totalMarginBalance}
                   unit="USDT"
                   color="text.primary"
-                  icon={<TimelineIcon sx={{ fontSize: 20 }} />}
+                  icon={<TimelineIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />}
                   description="账户总保证金"
                 />
               </Grid>
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid item xs={6} sm={6} md={3}>
                 <OverviewCard
                   title="总钱包余额"
                   value={accountBalance.totalWalletBalance}
                   unit="USDT"
                   color="text.primary"
-                  icon={<AccountBalanceWalletIcon sx={{ fontSize: 20 }} />}
+                  icon={<AccountBalanceWalletIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />}
                   description="钱包总资产"
                 />
               </Grid>
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid item xs={6} sm={6} md={3}>
                 <OverviewCard
                   title="总未实现盈亏"
                   value={accountBalance.totalUnrealizedProfit}
                   unit="USDT"
                   color={getProfitColor(accountBalance.totalUnrealizedProfit)}
-                  icon={<BarChartIcon sx={{ fontSize: 20 }} />}
+                  icon={<BarChartIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />}
                   description="当前持仓盈亏"
                 />
               </Grid>
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid item xs={6} sm={6} md={3}>
                 <OverviewCard
                   title="可用余额"
                   value={accountBalance.availableBalance}
                   unit="USDT"
                   color="text.primary"
-                  icon={<SpeedIcon sx={{ fontSize: 20 }} />}
+                  icon={<SpeedIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />}
                   description="可交易余额"
                 />
               </Grid>
@@ -478,144 +493,257 @@ export default function Home() {
           
           {loading ? (
             <Card sx={{ 
-              borderRadius: 4, 
+              borderRadius: { xs: 3, sm: 4 }, 
               boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
               border: '1px solid rgba(0, 0, 0, 0.05)'
             }}>
-              <CardContent>
-                <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 2 }} />
+              <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+                <Grid container spacing={{ xs: 2, sm: 3 }}>
+                  {[1, 2, 3, 4].map((item) => (
+                    <Grid item xs={12} sm={6} key={item}>
+                      <Card sx={{ borderRadius: 2 }}>
+                        <CardContent sx={{ p: 2 }}>
+                          <Skeleton variant="rectangular" height={80} sx={{ borderRadius: 1 }} />
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  ))}
+                </Grid>
               </CardContent>
             </Card>
           ) : positions && positions.length > 0 ? (
-            <Card sx={{ 
-              borderRadius: 4, 
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
-              border: '1px solid rgba(0, 0, 0, 0.05)',
-              overflow: 'hidden'
-            }}>
-              <CardContent sx={{ p: 0 }}>
-                <TableContainer>
-                  <Table>
-                    <TableHead>
-                      <TableRow sx={{ background: 'linear-gradient(135deg, #f8fafc, #f1f5f9)' }}>
-                        <TableCell sx={{ 
-                          fontWeight: '700', 
-                          color: 'text.primary', 
-                          py: 2.5,
-                          fontSize: '0.875rem',
-                          borderBottom: '2px solid #e5e7eb'
-                        }}>交易对</TableCell>
-                        <TableCell align="right" sx={{ 
-                          fontWeight: '700', 
-                          color: 'text.primary', 
-                          py: 2.5,
-                          fontSize: '0.875rem',
-                          borderBottom: '2px solid #e5e7eb'
-                        }}>持仓数量</TableCell>
-                        <TableCell align="right" sx={{ 
-                          fontWeight: '700', 
-                          color: 'text.primary', 
-                          py: 2.5,
-                          fontSize: '0.875rem',
-                          borderBottom: '2px solid #e5e7eb'
-                        }}>入场价格</TableCell>
-                        <TableCell align="right" sx={{ 
-                          fontWeight: '700', 
-                          color: 'text.primary', 
-                          py: 2.5,
-                          fontSize: '0.875rem',
-                          borderBottom: '2px solid #e5e7eb'
-                        }}>标记价格</TableCell>
-                        <TableCell align="right" sx={{ 
-                          fontWeight: '700', 
-                          color: 'text.primary', 
-                          py: 2.5,
-                          fontSize: '0.875rem',
-                          borderBottom: '2px solid #e5e7eb'
-                        }}>未实现盈亏</TableCell>
-                        <TableCell align="right" sx={{ 
-                          fontWeight: '700', 
-                          color: 'text.primary', 
-                          py: 2.5,
-                          fontSize: '0.875rem',
-                          borderBottom: '2px solid #e5e7eb'
-                        }}>杠杆</TableCell>
-                        <TableCell align="right" sx={{ 
-                          fontWeight: '700', 
-                          color: 'text.primary', 
-                          py: 2.5,
-                          fontSize: '0.875rem',
-                          borderBottom: '2px solid #e5e7eb'
-                        }}>保证金类型</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {positions.map((position: any, index: number) => (
-                        <Fade in={fadeIn} timeout={800 + index * 100} key={position.symbol}>
-                          <TableRow hover sx={{ 
-                            '&:last-child td, &:last-child th': { border: 0 },
-                            '&:hover': {
-                              backgroundColor: 'rgba(99, 102, 241, 0.02)',
-                            }
-                          }}>
-                            <TableCell component="th" scope="row" sx={{ py: 2.5 }}>
-                              <Typography fontWeight="600" color="text.primary" sx={{ fontSize: '0.875rem' }}>
-                                {position.symbol}
-                              </Typography>
-                            </TableCell>
-                            <TableCell align="right" sx={{ py: 2.5, fontWeight: 500 }}>{position.positionAmt}</TableCell>
-                            <TableCell align="right" sx={{ py: 2.5, fontWeight: 500 }}>{position.entryPrice}</TableCell>
-                            <TableCell align="right" sx={{ py: 2.5, fontWeight: 500 }}>{position.markPrice}</TableCell>
-                            <TableCell 
-                              align="right" 
+            <>
+              {/* 移动端卡片布局 */}
+              <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
+                {positions.map((position: any, index: number) => (
+                  <Fade in={fadeIn} timeout={800 + index * 100} key={position.symbol}>
+                    <Card 
+                      sx={{ 
+                        mb: 2, 
+                        borderRadius: 3,
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+                        border: '1px solid rgba(0, 0, 0, 0.05)',
+                        '&:last-child': { mb: 0 }
+                      }}
+                    >
+                      <CardContent sx={{ p: 2 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+                          <Typography fontWeight="700" color="text.primary" sx={{ fontSize: '1rem' }}>
+                            {position.symbol}
+                          </Typography>
+                          <Chip 
+                            label={`${position.leverage}x`} 
+                            size="small" 
+                            color="primary" 
+                            variant="filled" 
+                            sx={{ 
+                              fontWeight: '700',
+                              background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                              color: 'white',
+                              borderRadius: 1.5,
+                              px: 1,
+                              fontSize: '0.75rem'
+                            }}
+                          />
+                        </Box>
+                        
+                        <Grid container spacing={1}>
+                          <Grid item xs={6}>
+                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+                              持仓数量
+                            </Typography>
+                            <Typography fontWeight="600" sx={{ fontSize: '0.875rem' }}>
+                              {position.positionAmt}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+                              入场价格
+                            </Typography>
+                            <Typography fontWeight="600" sx={{ fontSize: '0.875rem' }}>
+                              {position.entryPrice}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+                              标记价格
+                            </Typography>
+                            <Typography fontWeight="600" sx={{ fontSize: '0.875rem' }}>
+                              {position.markPrice}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+                              未实现盈亏
+                            </Typography>
+                            <Typography 
+                              fontWeight="700" 
                               sx={{ 
-                                py: 2.5,
-                                fontWeight: '700',
-                                color: getProfitColor(position.unrealizedProfit),
-                                fontSize: '0.875rem'
+                                fontSize: '0.875rem',
+                                color: getProfitColor(position.unrealizedProfit)
                               }}
                             >
                               {formatNumber(position.unrealizedProfit)} USDT
-                            </TableCell>
-                            <TableCell align="right" sx={{ py: 2.5 }}>
-                              <Chip 
-                                label={`${position.leverage}x`} 
-                                size="small" 
-                                color="primary" 
-                                variant="filled" 
-                                sx={{ 
-                                  fontWeight: '700',
-                                  background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-                                  color: 'white',
-                                  borderRadius: 2,
-                                  px: 1
-                                }}
-                              />
-                            </TableCell>
-                            <TableCell align="right" sx={{ py: 2.5 }}>
-                              <Chip 
-                                label={position.marginType} 
-                                size="small" 
-                                color={position.marginType === 'isolated' ? 'warning' : 'info'} 
-                                variant="filled" 
-                                sx={{ 
-                                  fontWeight: '600',
-                                  borderRadius: 2,
-                                  px: 1,
-                                  background: position.marginType === 'isolated' 
-                                    ? 'linear-gradient(135deg, #f59e0b, #d97706)'
-                                    : 'linear-gradient(135deg, #06b6d4, #0891b2)'
-                                }}
-                              />
-                            </TableCell>
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                        
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1.5 }}>
+                          <Chip 
+                            label={position.marginType} 
+                            size="small" 
+                            color={position.marginType === 'isolated' ? 'warning' : 'info'} 
+                            variant="filled" 
+                            sx={{ 
+                              fontWeight: '600',
+                              borderRadius: 1,
+                              px: 1,
+                              fontSize: '0.7rem',
+                              background: position.marginType === 'isolated' 
+                                ? 'linear-gradient(135deg, #f59e0b, #d97706)'
+                                : 'linear-gradient(135deg, #06b6d4, #0891b2)'
+                            }}
+                          />
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  </Fade>
+                ))}
+              </Box>
+              
+              {/* 桌面端表格布局 */}
+              <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+                <Card sx={{ 
+                  borderRadius: 4, 
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+                  border: '1px solid rgba(0, 0, 0, 0.05)',
+                  overflow: 'hidden'
+                }}>
+                  <CardContent sx={{ p: 0 }}>
+                    <TableContainer>
+                      <Table>
+                        <TableHead>
+                          <TableRow sx={{ background: 'linear-gradient(135deg, #f8fafc, #f1f5f9)' }}>
+                            <TableCell sx={{ 
+                              fontWeight: '700', 
+                              color: 'text.primary', 
+                              py: 2.5,
+                              fontSize: '0.875rem',
+                              borderBottom: '2px solid #e5e7eb'
+                            }}>交易对</TableCell>
+                            <TableCell align="right" sx={{ 
+                              fontWeight: '700', 
+                              color: 'text.primary', 
+                              py: 2.5,
+                              fontSize: '0.875rem',
+                              borderBottom: '2px solid #e5e7eb'
+                            }}>持仓数量</TableCell>
+                            <TableCell align="right" sx={{ 
+                              fontWeight: '700', 
+                              color: 'text.primary', 
+                              py: 2.5,
+                              fontSize: '0.875rem',
+                              borderBottom: '2px solid #e5e7eb'
+                            }}>入场价格</TableCell>
+                            <TableCell align="right" sx={{ 
+                              fontWeight: '700', 
+                              color: 'text.primary', 
+                              py: 2.5,
+                              fontSize: '0.875rem',
+                              borderBottom: '2px solid #e5e7eb'
+                            }}>标记价格</TableCell>
+                            <TableCell align="right" sx={{ 
+                              fontWeight: '700', 
+                              color: 'text.primary', 
+                              py: 2.5,
+                              fontSize: '0.875rem',
+                              borderBottom: '2px solid #e5e7eb'
+                            }}>未实现盈亏</TableCell>
+                            <TableCell align="right" sx={{ 
+                              fontWeight: '700', 
+                              color: 'text.primary', 
+                              py: 2.5,
+                              fontSize: '0.875rem',
+                              borderBottom: '2px solid #e5e7eb'
+                            }}>杠杆</TableCell>
+                            <TableCell align="right" sx={{ 
+                              fontWeight: '700', 
+                              color: 'text.primary', 
+                              py: 2.5,
+                              fontSize: '0.875rem',
+                              borderBottom: '2px solid #e5e7eb'
+                            }}>保证金类型</TableCell>
                           </TableRow>
-                        </Fade>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </CardContent>
-            </Card>
+                        </TableHead>
+                        <TableBody>
+                          {positions.map((position: any, index: number) => (
+                            <Fade in={fadeIn} timeout={800 + index * 100} key={position.symbol}>
+                              <TableRow hover sx={{ 
+                                '&:last-child td, &:last-child th': { border: 0 },
+                                '&:hover': {
+                                  backgroundColor: 'rgba(99, 102, 241, 0.02)',
+                                }
+                              }}>
+                                <TableCell component="th" scope="row" sx={{ py: 2.5 }}>
+                                  <Typography fontWeight="600" color="text.primary" sx={{ fontSize: '0.875rem' }}>
+                                    {position.symbol}
+                                  </Typography>
+                                </TableCell>
+                                <TableCell align="right" sx={{ py: 2.5, fontWeight: 500 }}>{position.positionAmt}</TableCell>
+                                <TableCell align="right" sx={{ py: 2.5, fontWeight: 500 }}>{position.entryPrice}</TableCell>
+                                <TableCell align="right" sx={{ py: 2.5, fontWeight: 500 }}>{position.markPrice}</TableCell>
+                                <TableCell 
+                                  align="right" 
+                                  sx={{ 
+                                    py: 2.5,
+                                    fontWeight: '700',
+                                    color: getProfitColor(position.unrealizedProfit),
+                                    fontSize: '0.875rem'
+                                  }}
+                                >
+                                  {formatNumber(position.unrealizedProfit)} USDT
+                                </TableCell>
+                                <TableCell align="right" sx={{ py: 2.5 }}>
+                                  <Chip 
+                                    label={`${position.leverage}x`} 
+                                    size="small" 
+                                    color="primary" 
+                                    variant="filled" 
+                                    sx={{ 
+                                      fontWeight: '700',
+                                      background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                      color: 'white',
+                                      borderRadius: 2,
+                                      px: 1
+                                    }}
+                                  />
+                                </TableCell>
+                                <TableCell align="right" sx={{ py: 2.5 }}>
+                                  <Chip 
+                                    label={position.marginType} 
+                                    size="small" 
+                                    color={position.marginType === 'isolated' ? 'warning' : 'info'} 
+                                    variant="filled" 
+                                    sx={{ 
+                                      fontWeight: '600',
+                                      borderRadius: 2,
+                                      px: 1,
+                                      background: position.marginType === 'isolated' 
+                                        ? 'linear-gradient(135deg, #f59e0b, #d97706)'
+                                        : 'linear-gradient(135deg, #06b6d4, #0891b2)'
+                                    }}
+                                  />
+                                </TableCell>
+                              </TableRow>
+                            </Fade>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </CardContent>
+                </Card>
+              </Box>
+            </>
           ) : (
             <Alert 
               severity="info" 
